@@ -14,11 +14,11 @@ interface PlayerSeatProps {
 
 const actionLabels: Partial<Record<ActionType, { label: string; color: string }>> = {
   fold: { label: 'FOLD', color: 'bg-[hsl(var(--action-fold))]' },
-  check: { label: 'CHECK', color: 'bg-[hsl(var(--muted))]' },
+  check: { label: 'CHECK', color: 'bg-[hsl(var(--action-check))]' },
   call: { label: 'CALL', color: 'bg-[hsl(var(--action-call))]' },
   bet: { label: 'BET', color: 'bg-[hsl(var(--action-bet))]' },
   raise: { label: 'RAISE', color: 'bg-[hsl(var(--action-raise))]' },
-  post_blind: { label: 'BLIND', color: 'bg-[hsl(var(--muted))]' },
+  post_blind: { label: 'BLIND', color: 'bg-[hsl(var(--action-check))]' },
 };
 
 export function PlayerSeat({ player, isActive, showCards, position, isWinner, winAmount, lastAction }: PlayerSeatProps) {
