@@ -2,7 +2,7 @@ import { cn } from '@/lib/utils';
 import { ReplayStep } from '@/types/poker';
 import { PlayerSeat } from './PlayerSeat';
 import { PlayingCard } from './PlayingCard';
-import { estimateEquity } from '@/lib/equityCalculator';
+
 
 // 6-max seat positions clockwise around the oval table
 const SEAT_POSITIONS = [
@@ -21,7 +21,7 @@ interface PokerTableProps {
 }
 
 export function PokerTable({ step, winnerNames = [], winners = [] }: PokerTableProps) {
-  const equities = estimateEquity(step.players, step.communityCards, step.street);
+  
 
   return (
     <div className="relative w-full aspect-[16/10] max-w-[800px] mx-auto">
@@ -103,7 +103,7 @@ export function PokerTable({ step, winnerNames = [], winners = [] }: PokerTableP
               || (step.activePlayerName === player.name && !!player.holeCards)
               || !!player.holeCards
             }
-            equity={equities[player.name]}
+            
             position={SEAT_POSITIONS[player.seatIndex]}
             isWinner={winnerNames.includes(player.name)}
             winAmount={winInfo?.amount}
