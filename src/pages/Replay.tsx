@@ -72,6 +72,7 @@ const Replay = () => {
         <div className="flex-1 flex flex-col items-center justify-center min-h-[400px]">
           <PokerTable
             step={step}
+            allSteps={hand.steps}
             winnerNames={isShowdown ? winnerNames : []}
             winners={isShowdown ? hand.winners : []}
           />
