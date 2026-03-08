@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback } from 'react';
 import { splitHandFile } from '@/lib/handSplitter';
 import { putHandBatch } from '@/lib/db';
-import { HandMeta, HandRaw } from '@/types/poker';
+import { HandMeta, HandRaw, HandStats } from '@/types/poker';
 import { toast } from 'sonner';
 
 interface ImportState {
@@ -40,11 +40,11 @@ export function useImport(onComplete: () => void) {
 
     worker.onmessage = async (e: MessageEvent) => {
       const data = e.data as
-        | { type: 'progress'; processed: number; total: number; metas: HandMeta[]; raws: HandRaw[] }
+        | { type: 'progress'; processed: number; total: number; metas: HandMeta[]; raws: HandRaw[]; stats: HandStats[] }
         | { type: 'done'; totalImported: number };
 
       if (data.type === 'progress') {
-        await putHandBatch(data.metas, data.raws);
+        await putHandBatch(data.metas, data.raws, data.stats);
         setState(prev => ({ ...prev, processed: data.processed }));
       } else if (data.type === 'done') {
         setState({ isImporting: false, processed: 0, total: 0 });

@@ -24,14 +24,17 @@ export function parseHandHistory(text: string): ParsedHand {
   let handId = '';
   let tableName = '';
   let stakes = '';
+  let heroName = '';
   const players: Player[] = [];
   let dealerSeat = -1;
   const holeCards: Record<string, [Card, Card]> = {};
+  const uncalledReturns: Record<string, number> = {};
   const communityCards: Card[] = [];
   const actions: Action[] = [];
   const winners: { playerName: string; amount: number; hand?: string }[] = [];
 
   let currentStreet: Street = 'preflop';
+  let hadShowdown = false;
 
   for (const line of lines) {
     // Hand ID
@@ -68,6 +71,7 @@ export function parseHandHistory(text: string): ParsedHand {
     // Dealt cards
     const dealtMatch = line.match(/Dealt to (.+?) \[(.+?)\]/);
     if (dealtMatch) {
+      heroName = dealtMatch[1];
       const cards = parseCards(dealtMatch[2]);
       if (cards.length >= 2) {
         holeCards[dealtMatch[1]] = [cards[0], cards[1]];
@@ -87,7 +91,10 @@ export function parseHandHistory(text: string): ParsedHand {
       currentStreet = 'river';
       const cards = parseCards(line);
       if (cards.length > 0) communityCards.push(cards[cards.length - 1]);
-    } else if (line.startsWith('*** SHOW DOWN ***') || line.startsWith('*** SUMMARY ***')) {
+    } else if (line.startsWith('*** SHOW DOWN ***')) {
+      hadShowdown = true;
+      currentStreet = 'showdown';
+    } else if (line.startsWith('*** SUMMARY ***')) {
       currentStreet = 'showdown';
     }
 
@@ -132,6 +139,14 @@ export function parseHandHistory(text: string): ParsedHand {
       break;
     }
 
+    // Uncalled bet returned
+    const uncalledMatch = line.match(/Uncalled bet \(\$?([\d,.]+)\) returned to (.+)/);
+    if (uncalledMatch) {
+      const amount = parseFloat(uncalledMatch[1].replace(',', ''));
+      const playerName = uncalledMatch[2].trim();
+      uncalledReturns[playerName] = (uncalledReturns[playerName] ?? 0) + amount;
+    }
+
     // Winners
     const winMatch = line.match(/(.+?) collected \$?([\d,.]+)/);
     if (winMatch) {
@@ -160,7 +175,7 @@ export function parseHandHistory(text: string): ParsedHand {
   // Build replay steps
   const steps = buildReplaySteps(players, actions, communityCards, winners);
 
-  return { handId, tableName, stakes, players, steps, communityCards, winners };
+  return { handId, tableName, stakes, heroName, players, steps, communityCards, winners, uncalledReturns, hadShowdown };
 }
 
 function buildReplaySteps(

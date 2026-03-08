@@ -1,0 +1,14 @@
+PokerStars Hand #RC123456789: Hold'em No Limit ($0.50/$1 USD) - 2024/03/01 10:00:00 ET
+Table 'Orion V' 6-max Seat #1 is the button
+Seat 1: DealerDave ($100 in chips)
+Seat 2: FoldingFred ($100 in chips)
+Seat 3: QuickFold ($100 in chips)
+DealerDave: posts small blind $0.50
+FoldingFred: posts big blind $1
+*** HOLE CARDS ***
+Dealt to DealerDave [2c 7h]
+QuickFold: folds
+DealerDave: folds
+FoldingFred collected $0.50 from pot
+*** SUMMARY ***
+Total pot $0.50 | Rake $0

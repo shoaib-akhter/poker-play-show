@@ -43,10 +43,13 @@ export interface ParsedHand {
   handId: string;
   tableName: string;
   stakes: string;
+  heroName: string;
   players: Player[];
   steps: ReplayStep[];
   communityCards: Card[];
   winners: { playerName: string; amount: number; hand?: string }[];
+  uncalledReturns: Record<string, number>;
+  hadShowdown: boolean;
 }
 
 export interface HandMeta {
@@ -62,4 +65,55 @@ export interface HandMeta {
 export interface HandRaw {
   handId: string;
   rawText: string;
+}
+
+export interface HandStats {
+  handId: string;
+  stakes: string;
+  bbSize: number;
+  playedAt: number;
+  heroResult: number;
+  heroPosition: string;
+  playerCount: number;
+
+  // Preflop booleans
+  vpip: boolean;
+  pfr: boolean;
+  rfi: boolean;
+  limp: boolean;
+  coldCall: boolean;
+  threeBet: boolean;
+  facedPFRaise: boolean;
+  facedThreeBet: boolean;
+  foldTo3Bet: boolean;
+  call3Bet: boolean;
+  stealAttempt: boolean;
+  facedSteal: boolean;
+  foldedToSteal: boolean;
+  threeBetVsSteal: boolean;
+
+  // Postflop booleans
+  sawFlop: boolean;
+  sawTurn: boolean;
+  sawRiver: boolean;
+  sawShowdown: boolean;
+  wonAtShowdown: boolean;
+  wonMoneyWhenSawFlop: boolean;
+
+  // C-bet (null = not applicable)
+  cbetFlop: boolean | null;
+  facedCbetFlop: boolean;
+  foldedToCbetFlop: boolean;
+  calledCbetFlop: boolean;
+  raisedCbetFlop: boolean;
+
+  // Per-street aggression counts
+  preflopBetsRaises: number;
+  preflopCalls: number;
+  flopBetsRaises: number;
+  flopCalls: number;
+  turnBetsRaises: number;
+  turnCalls: number;
+  riverBetsRaises: number;
+  riverCalls: number;
 }

@@ -1,0 +1,23 @@
+PokerStars Hand #TEST001: Hold'em No Limit ($0.01/$0.02 USD) - 2026/02/15 10:00:00 ET
+Table 'TestTable' 6-max Seat #4 is the button
+Seat 1: HeroPlayer ($2.00 in chips)
+Seat 2: Villain1 ($2.00 in chips)
+Seat 3: Villain2 ($2.00 in chips)
+Seat 4: Villain3 ($2.00 in chips)
+Seat 5: SBPlayer ($2.00 in chips)
+Seat 6: BBPlayer ($2.00 in chips)
+SBPlayer: posts small blind $0.01
+BBPlayer: posts big blind $0.02
+*** HOLE CARDS ***
+Dealt to HeroPlayer [Ah Kd]
+HeroPlayer: raises $0.06 to $0.06
+Villain1: folds
+Villain2: folds
+Villain3: folds
+SBPlayer: folds
+BBPlayer: folds
+Uncalled bet ($0.04) returned to HeroPlayer
+HeroPlayer collected $0.05 from pot
+*** SUMMARY ***
+Total pot $0.05 | Rake $0
+Seat 1: HeroPlayer collected ($0.05)

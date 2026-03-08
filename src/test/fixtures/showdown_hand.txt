@@ -1,0 +1,25 @@
+PokerStars Hand #RC999000111: Hold'em No Limit ($1/$2 USD) - 2024/02/10 18:00:00 ET
+Table 'Nebula III' 6-max Seat #2 is the button
+Seat 1: HeroPlayer ($300 in chips)
+Seat 2: VillainX ($250 in chips)
+HeroPlayer: posts small blind $1
+VillainX: posts big blind $2
+*** HOLE CARDS ***
+Dealt to HeroPlayer [Ac Kc]
+HeroPlayer: raises $6 to $6
+VillainX: calls $4
+*** FLOP *** [As 7d 2h]
+HeroPlayer: bets $8
+VillainX: calls $8
+*** TURN *** [As 7d 2h] [Kh]
+HeroPlayer: bets $20
+VillainX: calls $20
+*** RIVER *** [As 7d 2h Kh] [5c]
+HeroPlayer: bets $50
+VillainX: calls $50
+*** SHOW DOWN ***
+HeroPlayer: shows [Ac Kc] (two pair, Aces and Kings)
+VillainX: shows [Ah Qs] (a pair of Aces)
+HeroPlayer collected $168 from pot
+*** SUMMARY ***
+Total pot $168 | Rake $0

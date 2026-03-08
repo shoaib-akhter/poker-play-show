@@ -1,6 +1,7 @@
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ReplayStep, ActionType, Street } from '@/types/poker';
+import { useEquity } from '@/hooks/useEquity';
 
 
 const STREETS: Street[] = ['preflop', 'flop', 'turn', 'river', 'showdown'];
@@ -18,10 +19,14 @@ interface SidePanelProps {
   steps: ReplayStep[];
   currentStep: number;
   currentStepData: ReplayStep;
+  heroCards: number[];
+  boardCards: number[];
+  numOpponents: number;
 }
 
-export function SidePanel({ steps, currentStep, currentStepData }: SidePanelProps) {
+export function SidePanel({ steps, currentStep, currentStepData, heroCards, boardCards, numOpponents }: SidePanelProps) {
   const completedStreetIndex = STREETS.indexOf(currentStepData.street);
+  const { result, loading } = useEquity(heroCards, boardCards, numOpponents);
 
   return (
     <div className="flex flex-col gap-4 h-full">
@@ -47,6 +52,45 @@ export function SidePanel({ steps, currentStep, currentStepData }: SidePanelProp
             </span>
           ))}
         </div>
+      </div>
+
+      {/* Equity */}
+      <div className="bg-[hsl(var(--card))] rounded-lg p-4 border border-[hsl(var(--border))]">
+        <h3 className="text-sm font-semibold text-[hsl(var(--foreground))] mb-2">
+          Equity
+          <span className="text-[10px] font-normal text-[hsl(var(--muted-foreground))] ml-1">
+            Monte Carlo (5k sims)
+          </span>
+        </h3>
+        {heroCards.length !== 2 ? (
+          <p className="text-xs text-[hsl(var(--muted-foreground))]">No hero cards</p>
+        ) : loading || !result ? (
+          <div className="flex items-center gap-2 text-xs text-[hsl(var(--muted-foreground))]">
+            <span className="inline-block w-3 h-3 border-2 border-[hsl(var(--gold))] border-t-transparent rounded-full animate-spin" />
+            Calculating…
+          </div>
+        ) : (
+          <div className="space-y-1">
+            <div className="flex justify-between text-xs">
+              <span className="text-green-400">Win</span>
+              <span className="mono font-semibold text-green-400">
+                {(result.winProbability * 100).toFixed(1)}%
+              </span>
+            </div>
+            <div className="flex justify-between text-xs">
+              <span className="text-yellow-400">Tie</span>
+              <span className="mono font-semibold text-yellow-400">
+                {(result.tieProbability * 100).toFixed(1)}%
+              </span>
+            </div>
+            <div className="flex justify-between text-xs">
+              <span className="text-red-400">Loss</span>
+              <span className="mono font-semibold text-red-400">
+                {(result.lossProbability * 100).toFixed(1)}%
+              </span>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Pot & Stacks */}

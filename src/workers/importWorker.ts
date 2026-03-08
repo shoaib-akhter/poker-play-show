@@ -1,7 +1,8 @@
 import { parseHandHistory } from '@/lib/handHistoryParser';
 import { splitHandFile, parseDateFromHeader } from '@/lib/handSplitter';
 import { extractHeroResult } from '@/lib/heroResult';
-import { HandMeta, HandRaw } from '@/types/poker';
+import { computeHandStats } from '@/lib/handStats';
+import { HandMeta, HandRaw, HandStats } from '@/types/poker';
 
 interface WorkerInput {
   handTexts: string[];
@@ -14,6 +15,7 @@ interface ProgressMessage {
   total: number;
   metas: HandMeta[];
   raws: HandRaw[];
+  stats: HandStats[];
 }
 
 interface DoneMessage {
@@ -31,6 +33,7 @@ self.onmessage = (e: MessageEvent<WorkerInput>) => {
     const batch = handTexts.slice(i, i + BATCH_SIZE);
     const metas: HandMeta[] = [];
     const raws: HandRaw[] = [];
+    const stats: HandStats[] = [];
 
     for (const rawText of batch) {
       try {
@@ -50,13 +53,17 @@ self.onmessage = (e: MessageEvent<WorkerInput>) => {
         });
 
         raws.push({ handId: parsed.handId, rawText });
+
+        const hs = computeHandStats(parsed, parsed.stakes, playedAt);
+        if (hs) stats.push(hs);
+
         processed++;
       } catch {
         // skip malformed hands
       }
     }
 
-    const msg: ProgressMessage = { type: 'progress', processed, total, metas, raws };
+    const msg: ProgressMessage = { type: 'progress', processed, total, metas, raws, stats };
     self.postMessage(msg);
   }
 

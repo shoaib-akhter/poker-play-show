@@ -1,10 +1,12 @@
 import { ParsedHand } from '@/types/poker';
 
 export function extractHeroResult(parsed: ParsedHand): { heroName: string; heroResult: number } {
-  const hero = parsed.steps[0]?.players.find(p => p.holeCards);
-  if (!hero) return { heroName: '', heroResult: 0 };
+  const heroName = parsed.heroName;
+  if (!heroName) return { heroName: '', heroResult: 0 };
 
-  const heroName = hero.name;
+  const hero = parsed.steps[0]?.players.find(p => p.name === heroName);
+  if (!hero) return { heroName, heroResult: 0 };
+
   const initialStack = hero.stackSize;
 
   const lastActionStep = [...parsed.steps].reverse().find(s => s.street !== 'showdown')
@@ -15,5 +17,7 @@ export function extractHeroResult(parsed: ParsedHand): { heroName: string; heroR
     .filter(w => w.playerName === heroName)
     .reduce((sum, w) => sum + w.amount, 0);
 
-  return { heroName, heroResult: (stackAfterBetting + heroWinnings) - initialStack };
+  const uncalledReturn = parsed.uncalledReturns[heroName] ?? 0;
+
+  return { heroName, heroResult: (stackAfterBetting + uncalledReturn + heroWinnings) - initialStack };
 }
