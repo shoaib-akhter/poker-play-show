@@ -50,8 +50,8 @@
     --suit-black: 0 0% 12%;
     --action-fold: 45 80% 50%;
     --action-call: 210 70% 50%;
-    --action-raise: 0 70% 50%;
-    --action-bet: 145 60% 42%;
+    --action-raise: 145 60% 32%;
+    --action-bet: 145 60% 32%;
     --action-check: 0 0% 15%;
 
     --sidebar-background: 150 15% 12%;

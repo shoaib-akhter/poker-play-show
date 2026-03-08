@@ -73,7 +73,7 @@ export function PlayerSeat({ player, isActive, showCards, position, isWinner, wi
         </div>
       )}
       {player.isFolded && (
-        <div className="rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide shadow-md bg-[hsl(var(--action-fold))] text-[hsl(var(--foreground))]">
+        <div className="rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide shadow-md bg-[hsl(var(--action-fold))] text-[hsl(var(--primary-foreground))]">
           FOLD
         </div>
       )}
