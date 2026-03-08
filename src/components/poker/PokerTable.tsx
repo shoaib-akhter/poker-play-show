@@ -93,6 +93,18 @@ export function PokerTable({ step, winnerNames = [], winners = [] }: PokerTableP
           );
         }
         const winInfo = winners.find(w => w.playerName === player.name);
+        
+        // Find the player's last action up to current step on current street
+        let lastAction: { type: import('@/types/poker').ActionType; amount?: number } | undefined;
+        for (let s = step.stepIndex; s >= 0; s--) {
+          const st = step; // we only have current step data
+          // Check if current step's action belongs to this player
+          if (s === step.stepIndex && step.action?.playerName === player.name) {
+            lastAction = { type: step.action.type, amount: step.action.amount };
+            break;
+          }
+        }
+
         return (
           <PlayerSeat
             key={player.name}
@@ -103,10 +115,10 @@ export function PokerTable({ step, winnerNames = [], winners = [] }: PokerTableP
               || (step.activePlayerName === player.name && !!player.holeCards)
               || !!player.holeCards
             }
-            
             position={SEAT_POSITIONS[player.seatIndex]}
             isWinner={winnerNames.includes(player.name)}
             winAmount={winInfo?.amount}
+            lastAction={step.action?.playerName === player.name ? { type: step.action.type, amount: step.action.amount } : undefined}
           />
         );
       })}
