@@ -21,12 +21,6 @@ interface SidePanelProps {
 }
 
 export function SidePanel({ steps, currentStep, currentStepData }: SidePanelProps) {
-  const equities = estimateEquity(
-    currentStepData.players,
-    currentStepData.communityCards,
-    currentStepData.street,
-  );
-
   const completedStreetIndex = STREETS.indexOf(currentStepData.street);
 
   return (
