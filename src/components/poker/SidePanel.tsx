@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ReplayStep, ActionType, Street } from '@/types/poker';
-import { estimateEquity } from '@/lib/equityCalculator';
+
 
 const STREETS: Street[] = ['preflop', 'flop', 'turn', 'river', 'showdown'];
 
@@ -21,12 +21,6 @@ interface SidePanelProps {
 }
 
 export function SidePanel({ steps, currentStep, currentStepData }: SidePanelProps) {
-  const equities = estimateEquity(
-    currentStepData.players,
-    currentStepData.communityCards,
-    currentStepData.street,
-  );
-
   const completedStreetIndex = STREETS.indexOf(currentStepData.street);
 
   return (
@@ -69,27 +63,6 @@ export function SidePanel({ steps, currentStep, currentStepData }: SidePanelProp
             )}>
               <span className="text-[hsl(var(--foreground))]">{p.name}</span>
               <span className="mono text-[hsl(var(--muted-foreground))]">${p.stackSize.toFixed(2)}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Hand Equity */}
-      <div className="bg-[hsl(var(--card))] rounded-lg p-4 border border-[hsl(var(--border))]">
-        <h3 className="text-sm font-semibold text-[hsl(var(--foreground))] mb-2">Hand Equity</h3>
-        <div className="space-y-2">
-          {currentStepData.players.filter(p => !p.isFolded).map(p => (
-            <div key={p.name} className="flex items-center gap-2">
-              <span className="text-xs text-[hsl(var(--foreground))] w-24 truncate">{p.name}</span>
-              <div className="flex-1 h-2 rounded-full bg-[hsl(var(--muted))] overflow-hidden">
-                <div
-                  className="h-full rounded-full bg-[hsl(var(--gold))] transition-all duration-300"
-                  style={{ width: `${equities[p.name] || 0}%` }}
-                />
-              </div>
-              <span className="mono text-[10px] text-[hsl(var(--muted-foreground))] w-8 text-right">
-                {equities[p.name] || 0}%
-              </span>
             </div>
           ))}
         </div>
