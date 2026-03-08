@@ -9,6 +9,7 @@ interface PlayerSeatProps {
   equity?: number;
   position: { top: string; left: string };
   isWinner?: boolean;
+  winAmount?: number;
 }
 
 const actionLabels: Partial<Record<ActionType, { label: string; color: string }>> = {
@@ -20,7 +21,7 @@ const actionLabels: Partial<Record<ActionType, { label: string; color: string }>
   post_blind: { label: 'BLIND', color: 'bg-[hsl(var(--muted))]' },
 };
 
-export function PlayerSeat({ player, isActive, showCards, equity, position, isWinner }: PlayerSeatProps) {
+export function PlayerSeat({ player, isActive, showCards, equity, position, isWinner, winAmount }: PlayerSeatProps) {
   return (
     <div
       className="absolute flex flex-col items-center gap-1 -translate-x-1/2 -translate-y-1/2 z-10"
@@ -56,6 +57,9 @@ export function PlayerSeat({ player, isActive, showCards, equity, position, isWi
         </div>
         {equity !== undefined && !player.isFolded && (
           <div className="text-[10px] text-[hsl(var(--gold))] font-medium">{equity}% equity</div>
+        )}
+        {isWinner && winAmount !== undefined && (
+          <div className="text-xs font-bold text-green-400 mt-0.5">+${winAmount.toFixed(2)}</div>
         )}
       </div>
 
