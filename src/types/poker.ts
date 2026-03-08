@@ -48,3 +48,18 @@ export interface ParsedHand {
   communityCards: Card[];
   winners: { playerName: string; amount: number; hand?: string }[];
 }
+
+export interface HandMeta {
+  handId: string;
+  tableName: string;
+  stakes: string;
+  playedAt: number;
+  heroName: string;
+  heroResult: number;
+  playerCount: number;
+}
+
+export interface HandRaw {
+  handId: string;
+  rawText: string;
+}

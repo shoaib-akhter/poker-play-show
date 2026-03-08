@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { SAMPLE_HAND_HISTORY } from '@/lib/handHistoryParser';
-import { Spade } from 'lucide-react';
+import { Spade, Library } from 'lucide-react';
 
 const Index = () => {
   const [handText, setHandText] = useState('');
@@ -33,6 +33,12 @@ const Index = () => {
           <p className="text-muted-foreground text-lg">
             Paste a PokerStars hand history to replay it step-by-step
           </p>
+          <Link to="/library">
+            <Button variant="outline" size="sm" className="gap-2 mt-1">
+              <Library className="w-4 h-4" />
+              My Library
+            </Button>
+          </Link>
         </div>
 
         {/* Input area */}
