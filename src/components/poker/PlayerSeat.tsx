@@ -6,10 +6,10 @@ interface PlayerSeatProps {
   player: Player;
   isActive: boolean;
   showCards: boolean;
-  
   position: { top: string; left: string };
   isWinner?: boolean;
   winAmount?: number;
+  lastAction?: { type: ActionType; amount?: number };
 }
 
 const actionLabels: Partial<Record<ActionType, { label: string; color: string }>> = {
@@ -21,7 +21,9 @@ const actionLabels: Partial<Record<ActionType, { label: string; color: string }>
   post_blind: { label: 'BLIND', color: 'bg-[hsl(var(--muted))]' },
 };
 
-export function PlayerSeat({ player, isActive, showCards, position, isWinner, winAmount }: PlayerSeatProps) {
+export function PlayerSeat({ player, isActive, showCards, position, isWinner, winAmount, lastAction }: PlayerSeatProps) {
+  const actionInfo = lastAction ? actionLabels[lastAction.type] : null;
+
   return (
     <div
       className="absolute flex flex-col items-center gap-1 -translate-x-1/2 -translate-y-1/2 z-10"
@@ -59,6 +61,22 @@ export function PlayerSeat({ player, isActive, showCards, position, isWinner, wi
           <div className="text-xs font-bold text-green-400 mt-0.5">+${winAmount.toFixed(2)}</div>
         )}
       </div>
+
+      {/* Action label */}
+      {actionInfo && !player.isFolded && (
+        <div className={cn(
+          'rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide shadow-md',
+          'text-[hsl(var(--foreground))]',
+          actionInfo.color,
+        )}>
+          {actionInfo.label}{lastAction?.amount ? ` $${lastAction.amount.toFixed(2)}` : ''}
+        </div>
+      )}
+      {player.isFolded && (
+        <div className="rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide shadow-md bg-[hsl(var(--action-fold))] text-[hsl(var(--foreground))]">
+          FOLD
+        </div>
+      )}
 
       {/* Dealer button */}
       {player.isDealer && (
