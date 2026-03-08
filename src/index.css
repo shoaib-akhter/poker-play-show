@@ -48,10 +48,11 @@
     --card-back: 220 60% 35%;
     --suit-red: 0 80% 50%;
     --suit-black: 0 0% 12%;
-    --action-fold: 0 60% 50%;
-    --action-call: 145 50% 45%;
-    --action-raise: 220 70% 55%;
-    --action-bet: 35 80% 55%;
+    --action-fold: 45 80% 50%;
+    --action-call: 210 70% 50%;
+    --action-raise: 0 70% 50%;
+    --action-bet: 145 60% 42%;
+    --action-check: 0 0% 15%;
 
     --sidebar-background: 150 15% 12%;
     --sidebar-foreground: 45 20% 85%;
