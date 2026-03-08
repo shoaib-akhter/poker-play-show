@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import { ReplayStep } from '@/types/poker';
+import { ReplayStep, ActionType } from '@/types/poker';
 import { PlayerSeat } from './PlayerSeat';
 import { PlayingCard } from './PlayingCard';
 
@@ -16,11 +16,24 @@ const SEAT_POSITIONS = [
 
 interface PokerTableProps {
   step: ReplayStep;
+  allSteps: ReplayStep[];
   winnerNames?: string[];
   winners?: { playerName: string; amount: number; hand?: string }[];
 }
 
-export function PokerTable({ step, winnerNames = [], winners = [] }: PokerTableProps) {
+export function PokerTable({ step, allSteps, winnerNames = [], winners = [] }: PokerTableProps) {
+  // Build a map of each player's last action on the current street up to the current step
+  const playerLastActions = new Map<string, { type: ActionType; amount?: number }>();
+  for (let s = 0; s <= step.stepIndex; s++) {
+    const st = allSteps[s];
+    if (!st?.action) continue;
+    if (st.street !== step.street) {
+      // New street started, clear previous actions
+      playerLastActions.clear();
+      continue;
+    }
+    playerLastActions.set(st.action.playerName, { type: st.action.type, amount: st.action.amount });
+  }
   
 
   return (
@@ -93,17 +106,7 @@ export function PokerTable({ step, winnerNames = [], winners = [] }: PokerTableP
           );
         }
         const winInfo = winners.find(w => w.playerName === player.name);
-        
-        // Find the player's last action up to current step on current street
-        let lastAction: { type: import('@/types/poker').ActionType; amount?: number } | undefined;
-        for (let s = step.stepIndex; s >= 0; s--) {
-          const st = step; // we only have current step data
-          // Check if current step's action belongs to this player
-          if (s === step.stepIndex && step.action?.playerName === player.name) {
-            lastAction = { type: step.action.type, amount: step.action.amount };
-            break;
-          }
-        }
+        const lastAction = playerLastActions.get(player.name);
 
         return (
           <PlayerSeat
@@ -118,7 +121,7 @@ export function PokerTable({ step, winnerNames = [], winners = [] }: PokerTableP
             position={SEAT_POSITIONS[player.seatIndex]}
             isWinner={winnerNames.includes(player.name)}
             winAmount={winInfo?.amount}
-            lastAction={step.action?.playerName === player.name ? { type: step.action.type, amount: step.action.amount } : undefined}
+            lastAction={lastAction}
           />
         );
       })}
