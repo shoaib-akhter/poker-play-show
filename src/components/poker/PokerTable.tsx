@@ -4,14 +4,14 @@ import { PlayerSeat } from './PlayerSeat';
 import { PlayingCard } from './PlayingCard';
 import { estimateEquity } from '@/lib/equityCalculator';
 
-// 6-max seat positions around an oval table
+// 6-max seat positions clockwise around the oval table
 const SEAT_POSITIONS = [
   { top: '85%', left: '30%' },   // seat 0 - bottom left
-  { top: '85%', left: '70%' },   // seat 1 - bottom right
-  { top: '45%', left: '95%' },   // seat 2 - right
+  { top: '45%', left: '5%' },    // seat 1 - left
+  { top: '8%', left: '30%' },    // seat 2 - top left
   { top: '8%', left: '70%' },    // seat 3 - top right
-  { top: '8%', left: '30%' },    // seat 4 - top left
-  { top: '45%', left: '5%' },    // seat 5 - left
+  { top: '45%', left: '95%' },   // seat 4 - right
+  { top: '85%', left: '70%' },   // seat 5 - bottom right
 ];
 
 interface PokerTableProps {
@@ -75,8 +75,22 @@ export function PokerTable({ step, winnerNames = [] }: PokerTableProps) {
       </div>
 
       {/* Player seats */}
-      {step.players.map((player) => {
-        const posIndex = player.seatIndex % 6;
+      {Array.from({ length: 6 }).map((_, i) => {
+        const player = step.players.find(p => p.seatIndex === i);
+        if (!player) {
+          return (
+            <div
+              key={`empty-seat-${i}`}
+              className="absolute flex flex-col items-center gap-1 -translate-x-1/2 -translate-y-1/2 z-10"
+              style={{ top: SEAT_POSITIONS[i].top, left: SEAT_POSITIONS[i].left }}
+            >
+              <div className="rounded-lg px-3 py-1.5 min-w-[100px] text-center bg-[hsl(var(--card))] border-2 border-[hsl(var(--border))] opacity-30 shadow-lg">
+                <div className="font-semibold text-xs text-[hsl(var(--muted-foreground))]">Seat {i + 1}</div>
+                <div className="text-[10px] text-[hsl(var(--muted-foreground))] italic">Sitting Out</div>
+              </div>
+            </div>
+          );
+        }
         return (
           <PlayerSeat
             key={player.name}
@@ -85,10 +99,10 @@ export function PokerTable({ step, winnerNames = [] }: PokerTableProps) {
             showCards={
               step.street === 'showdown' && !!player.holeCards
               || (step.activePlayerName === player.name && !!player.holeCards)
-              || !!player.holeCards // show known cards
+              || !!player.holeCards
             }
             equity={equities[player.name]}
-            position={SEAT_POSITIONS[posIndex]}
+            position={SEAT_POSITIONS[player.seatIndex]}
             isWinner={winnerNames.includes(player.name)}
           />
         );
