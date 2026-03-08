@@ -17,9 +17,10 @@ const SEAT_POSITIONS = [
 interface PokerTableProps {
   step: ReplayStep;
   winnerNames?: string[];
+  winners?: { playerName: string; amount: number; hand?: string }[];
 }
 
-export function PokerTable({ step, winnerNames = [] }: PokerTableProps) {
+export function PokerTable({ step, winnerNames = [], winners = [] }: PokerTableProps) {
   const equities = estimateEquity(step.players, step.communityCards, step.street);
 
   return (
@@ -91,6 +92,7 @@ export function PokerTable({ step, winnerNames = [] }: PokerTableProps) {
             </div>
           );
         }
+        const winInfo = winners.find(w => w.playerName === player.name);
         return (
           <PlayerSeat
             key={player.name}
@@ -104,6 +106,7 @@ export function PokerTable({ step, winnerNames = [] }: PokerTableProps) {
             equity={equities[player.name]}
             position={SEAT_POSITIONS[player.seatIndex]}
             isWinner={winnerNames.includes(player.name)}
+            winAmount={winInfo?.amount}
           />
         );
       })}

@@ -73,6 +73,7 @@ const Replay = () => {
           <PokerTable
             step={step}
             winnerNames={isShowdown ? winnerNames : []}
+            winners={isShowdown ? hand.winners : []}
           />
           <ControlsBar
             currentStep={currentStep}
