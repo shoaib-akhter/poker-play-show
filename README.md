@@ -1,73 +1,58 @@
-# Welcome to your Lovable project
+# poker-play-show
 
-## Project info
+A browser-based PokerStars hand history replayer and analytics tool. Import your hand histories, step through hands action-by-action, and analyse your play with stats, position breakdowns, and a hand range heatmap.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## Features
 
-## How can I edit this code?
+- **Hand Replay** — step through any hand action-by-action on a visual 6-max table. Keyboard navigation (←/→/Space). Copy the raw hand text to clipboard from the replay view.
+- **Real-time Equity** — Monte Carlo simulation (5k runs, Web Worker) shows win/tie/loss % at every street based on hero hole cards and board.
+- **Hand Library** — bulk import `.txt` files (drag-drop or folder picker). Hands are stored in IndexedDB and persist across sessions. Filter by stakes, position, last N hands, won/lost.
+- **Statistics** — cumulative P&L chart ($ or BB), key metrics (VPIP, PFR, 3-Bet, C-Bet, WTSD, W$SD, AF, BB/100), and a position breakdown table. Click a position row to drill into those hands in the library.
+- **Range Analysis** — 13×13 hand matrix heatmap. See your P&L, win rate, or frequency for every hand combo (AA, AKs, 72o, etc.). Click any cell to view and replay those specific hands.
 
-There are several ways of editing your application.
+## Tech Stack
 
-**Use Lovable**
+| Layer | Technology |
+|-------|-----------|
+| UI framework | React 18 + TypeScript 5 (strict) |
+| Build tool | Vite 5 |
+| Styling | Tailwind CSS + shadcn/ui (Radix primitives) |
+| Routing | React Router v6 |
+| Storage | IndexedDB via `idb` |
+| Charts | Recharts |
+| Background compute | Web Workers (equity, import, stats recalc) |
+| Tests | Vitest (52 tests) |
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+## Getting Started
 
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+```bash
+git clone git@github.com:shoaib-akhter/poker-play-show.git
+cd poker-play-show
+npm install
+npm run dev        # http://localhost:8080
 ```
 
-**Edit a file directly in GitHub**
+## Scripts
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```bash
+npm run dev        # Dev server (port 8080, LAN accessible)
+npm run build      # Production build → dist/
+npm run typecheck  # tsc --noEmit
+npm test           # Vitest test suite
+npm run lint       # ESLint
+```
 
-**Use GitHub Codespaces**
+## Architecture
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+All processing happens client-side — no backend, no server, no auth.
 
-## What technologies are used for this project?
+- **Parsing** — `src/lib/handHistoryParser.ts` parses PokerStars cash-game format into a typed `ParsedHand` with full `ReplayStep[]` snapshots.
+- **Storage** — IndexedDB (`poker-replay-db` v5) holds three stores: `hand_meta`, `hand_raw`, `hand_stats`. Re-importing the same files is always safe (upsert by `handId`).
+- **Workers** — heavy work runs off the main thread: `importWorker` (batch parse + stats on import), `statsWorker` (recalculate stats from raw), `equityWorker` (Monte Carlo per step).
+- **Hand evaluator** — exhaustive C(7,5)=21 combo evaluator with sortable integer scores. Used inside the Monte Carlo engine.
 
-This project is built with:
+See [`project-architecture.md`](./project-architecture.md) for detailed data flow diagrams and [`project-progress.md`](./project-progress.md) for feature status and known issues.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## Supported Format
 
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+PokerStars cash game hand histories (Texas Hold'em, up to 6 players). Tournament format is not currently supported.
