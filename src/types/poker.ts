@@ -116,4 +116,7 @@ export interface HandStats {
   turnCalls: number;
   riverBetsRaises: number;
   riverCalls: number;
+
+  // Hero hole cards (for range analysis)
+  heroHoleCards?: [Card, Card];
 }

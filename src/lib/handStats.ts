@@ -1,5 +1,27 @@
-import { ParsedHand, HandStats, Action, ActionType } from '@/types/poker';
+import { ParsedHand, HandStats, Action, ActionType, Card } from '@/types/poker';
 import { extractHeroResult } from '@/lib/heroResult';
+
+const RANKS = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'] as const;
+type RankChar = typeof RANKS[number];
+
+export function getHandComboKey(c1: Card, c2: Card): string {
+  const i1 = RANKS.indexOf(c1.rank as RankChar);
+  const i2 = RANKS.indexOf(c2.rank as RankChar);
+  const hi = Math.min(i1, i2);
+  const lo = Math.max(i1, i2);
+  if (hi === lo) return `${RANKS[hi]}${RANKS[hi]}`;
+  return `${RANKS[hi]}${RANKS[lo]}${c1.suit === c2.suit ? 's' : 'o'}`;
+}
+
+export function getMatrixPosition(key: string): { row: number; col: number } {
+  if (key.length === 2) {
+    const idx = RANKS.indexOf(key[0] as RankChar);
+    return { row: idx, col: idx };
+  }
+  const hi = RANKS.indexOf(key[0] as RankChar);
+  const lo = RANKS.indexOf(key[1] as RankChar);
+  return key[2] === 's' ? { row: hi, col: lo } : { row: lo, col: hi };
+}
 
 export function parseBBSize(stakes: string): number {
   const m = stakes.match(/\$?([\d.]+)\s*\/\s*\$?([\d.]+)/);
@@ -66,6 +88,9 @@ export function computeHandStats(
 ): HandStats | null {
   const heroName = parsed.heroName;
   if (!heroName) return null;
+
+  const heroPlayer = parsed.players.find(p => p.name === heroName);
+  const heroHoleCards = heroPlayer?.holeCards;
 
   const bbSize = parseBBSize(stakes);
   const { heroResult } = extractHeroResult(parsed);
@@ -244,5 +269,7 @@ export function computeHandStats(
     flopBetsRaises, flopCalls,
     turnBetsRaises, turnCalls,
     riverBetsRaises, riverCalls,
+
+    ...(heroHoleCards ? { heroHoleCards } : {}),
   };
 }

@@ -21,7 +21,7 @@ let dbPromise: Promise<IDBPDatabase<PokerDB>> | null = null;
 
 function getDB(): Promise<IDBPDatabase<PokerDB>> {
   if (!dbPromise) {
-    dbPromise = openDB<PokerDB>('poker-replay-db', 4, {
+    dbPromise = openDB<PokerDB>('poker-replay-db', 5, {
       upgrade(db, oldVersion, _newVersion, transaction) {
         if (oldVersion < 1) {
           const metaStore = db.createObjectStore('hand_meta', { keyPath: 'handId' });
@@ -34,6 +34,10 @@ function getDB(): Promise<IDBPDatabase<PokerDB>> {
         }
         if (oldVersion < 4) {
           // Clear hand_stats so corrected showdown detection logic is applied on next recalc
+          transaction.objectStore('hand_stats').clear();
+        }
+        if (oldVersion < 5) {
+          // Clear hand_stats to add heroHoleCards field on next recalc
           transaction.objectStore('hand_stats').clear();
         }
       },

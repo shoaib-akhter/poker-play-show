@@ -1,6 +1,6 @@
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Spade, BarChart2, X } from 'lucide-react';
+import { ArrowLeft, Spade, BarChart2, Grid2x2, X } from 'lucide-react';
 import { ImportZone } from '@/components/library/ImportZone';
 import { HandTable } from '@/components/library/HandTable';
 import { useImport } from '@/hooks/useImport';
@@ -63,6 +63,12 @@ export default function Library() {
           <Button variant="ghost" size="sm" className="gap-2">
             <BarChart2 className="w-4 h-4" />
             Statistics
+          </Button>
+        </Link>
+        <Link to="/range">
+          <Button variant="ghost" size="sm" className="gap-2">
+            <Grid2x2 className="w-4 h-4" />
+            Range
           </Button>
         </Link>
       </div>

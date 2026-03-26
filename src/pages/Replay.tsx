@@ -6,7 +6,7 @@ import { PokerTable } from '@/components/poker/PokerTable';
 import { ControlsBar } from '@/components/poker/ControlsBar';
 import { SidePanel } from '@/components/poker/SidePanel';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Copy, Check } from 'lucide-react';
 import { parseCard } from '@/lib/cards';
 
 function toCardInt(c: Card): number {
@@ -27,6 +27,15 @@ const Replay = () => {
   const navigate = useNavigate();
   const [hand, setHand] = useState<ParsedHand | null>(null);
   const [currentStep, setCurrentStep] = useState(0);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = useCallback(() => {
+    const text = sessionStorage.getItem('poker_hand') ?? '';
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }, []);
 
   useEffect(() => {
     const text = sessionStorage.getItem('poker_hand');
@@ -77,7 +86,7 @@ const Replay = () => {
         <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
           <ArrowLeft className="w-4 h-4" />
         </Button>
-        <div>
+        <div className="flex-1">
           <h2 className="text-sm font-semibold text-foreground">
             {hand.tableName || 'Hand Replay'}
           </h2>
@@ -85,6 +94,10 @@ const Replay = () => {
             {hand.stakes} • Hand #{hand.handId}
           </p>
         </div>
+        <Button variant="ghost" size="sm" className="gap-2" onClick={handleCopy}>
+          {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+          {copied ? 'Copied!' : 'Copy Hand'}
+        </Button>
       </div>
 
       {/* Main content */}

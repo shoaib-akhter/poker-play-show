@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { ArrowLeft, Spade, BarChart2, Library, RefreshCw } from 'lucide-react';
+import { ArrowLeft, Spade, BarChart2, Library, Grid2x2, RefreshCw } from 'lucide-react';
 import { getAllHandStats, getHandCount, getHandStatsCount } from '@/lib/db';
 import { aggregateStats, aggregateByPosition } from '@/lib/statsAggregator';
 import { useRecalcStats } from '@/hooks/useRecalcStats';
@@ -68,6 +68,12 @@ export default function Stats() {
           <Button variant="ghost" size="sm" className="gap-2">
             <Library className="w-4 h-4" />
             Library
+          </Button>
+        </Link>
+        <Link to="/range">
+          <Button variant="ghost" size="sm" className="gap-2">
+            <Grid2x2 className="w-4 h-4" />
+            Range
           </Button>
         </Link>
         <Button

@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { SAMPLE_HAND_HISTORY } from '@/lib/handHistoryParser';
-import { Spade, Library, BarChart2 } from 'lucide-react';
+import { Spade, Library, BarChart2, Grid2x2 } from 'lucide-react';
 
 const Index = () => {
   const [handText, setHandText] = useState('');
@@ -44,6 +44,12 @@ const Index = () => {
               <Button variant="outline" size="sm" className="gap-2">
                 <BarChart2 className="w-4 h-4" />
                 Statistics
+              </Button>
+            </Link>
+            <Link to="/range">
+              <Button variant="outline" size="sm" className="gap-2">
+                <Grid2x2 className="w-4 h-4" />
+                Range
               </Button>
             </Link>
           </div>
