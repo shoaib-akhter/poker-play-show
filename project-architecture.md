@@ -62,8 +62,9 @@ App.tsx
 ├── Toaster                     (shadcn toast)
 ├── Sonner                      (sonner toast)
 └── BrowserRouter
-    ├── Route "/"       → Index.tsx
-    ├── Route "/replay" → Replay.tsx
+    ├── Route "/"        → Index.tsx
+    ├── Route "/replay"  → Replay.tsx
+    │   ├── Copy Hand button (clipboard)
     │   ├── <PokerTable>
     │   │   ├── <PlayerSeat>  ×6  (one per seat position)
     │   │   │   └── <PlayingCard>  ×2  (hole cards)
@@ -71,7 +72,17 @@ App.tsx
     │   ├── <ControlsBar>
     │   └── <SidePanel>
     │       └── useEquity()  ──► Web Worker
-    └── Route "*"       → NotFound.tsx
+    ├── Route "/library" → Library.tsx
+    │   ├── <ImportZone>
+    │   └── <HandTable>
+    ├── Route "/stats"   → Stats.tsx
+    │   ├── <PnlChart>
+    │   ├── <GeneralStats>
+    │   └── <PositionStats>
+    ├── Route "/range"   → Range.tsx
+    │   ├── <HandMatrix>     (13×13 heatmap grid)
+    │   └── <HandListPanel>  (shadcn Sheet)
+    └── Route "*"        → NotFound.tsx
 ```
 
 ---
@@ -321,11 +332,33 @@ main.tsx
                     └── components/library/HandTable.tsx
                           └── lib/db.ts             (getRawText)
 
+              ├── Stats.tsx
+              │     ├── lib/db.ts                (getAllHandStats, getHandCount, getHandStatsCount)
+              │     ├── lib/statsAggregator.ts   (aggregateStats, aggregateByPosition)
+              │     ├── hooks/useRecalcStats.ts
+              │     │     └── [Web Worker] workers/statsWorker.ts
+              │     │           ├── lib/handHistoryParser.ts
+              │     │           ├── lib/handStats.ts    (computeHandStats)
+              │     │           └── lib/heroResult.ts
+              │     ├── components/stats/PnlChart.tsx
+              │     ├── components/stats/GeneralStats.tsx
+              │     └── components/stats/PositionStats.tsx
+              │
+              └── Range.tsx
+                    ├── lib/db.ts                (getAllHandStats, getRawText)
+                    ├── lib/handStats.ts         (getHandComboKey, getMatrixPosition)
+                    ├── components/range/HandMatrix.tsx
+                    │     └── lib/handStats.ts   (getHandComboKey)
+                    └── components/range/HandListPanel.tsx
+                          └── lib/db.ts          (getRawText)
+
 lib/cards.ts           (no local imports)
 lib/handEvaluator.ts   (no local imports)
 lib/handSplitter.ts    (no local imports)
 lib/heroResult.ts      → types/poker.ts
+lib/handStats.ts       → types/poker.ts, lib/heroResult.ts
 lib/monteCarlo.ts      → lib/cards.ts, lib/handEvaluator.ts
+lib/statsAggregator.ts → types/poker.ts
 lib/db.ts              → types/poker.ts, idb
 lib/equityCalculator.ts  ← DEPRECATED, not imported by any live code
 ```
@@ -335,7 +368,7 @@ lib/equityCalculator.ts  ← DEPRECATED, not imported by any live code
 ## IndexedDB Schema
 
 ```
-Database: poker-replay-db  v1
+Database: poker-replay-db  v5
 
 hand_meta  (keyPath: handId)
   ├── handId: string         ← primary key; put() = upsert → safe re-import
@@ -350,8 +383,17 @@ hand_raw   (keyPath: handId)
   ├── handId: string
   └── rawText: string        ← single hand raw text (~3 KB each)
 
-Library table queries hand_meta only.
-Replay button does a point lookup on hand_raw.
+hand_stats (keyPath: handId)
+  ├── handId, stakes, bbSize, playedAt, heroResult, heroPosition, playerCount
+  ├── preflop booleans: vpip, pfr, rfi, limp, coldCall, threeBet, facedPFRaise...
+  ├── postflop booleans: sawFlop, sawTurn, sawRiver, sawShowdown, wonAtShowdown...
+  ├── c-bet: cbetFlop (bool|null), facedCbetFlop, foldedToCbetFlop...
+  ├── per-street counts: preflopBetsRaises, preflopCalls, flopBetsRaises...
+  └── heroHoleCards?: [Card, Card]   ← added v5; used by Range page
+
+Version bump policy: increment version + clear hand_stats in upgrade callback
+whenever HandStats computation logic changes. Stats page shows recalc banner
+when hand_meta count > hand_stats count.
 ```
 
 ---
@@ -394,14 +436,17 @@ useImport.ts
 
 ```
 /          → Index.tsx    (landing page, hand input)
-/replay    → Replay.tsx   (replay viewer)
+/replay    → Replay.tsx   (replay viewer + Copy Hand button)
 /library   → Library.tsx  (hand library — bulk import, browse, filter, replay)
+/stats     → Stats.tsx    (P&L chart, VPIP/PFR/etc, position breakdown)
+/range     → Range.tsx    (13×13 hand matrix heatmap, combo drill-down)
 *          → NotFound.tsx (404)
 ```
 
 Data is passed between pages via `sessionStorage` (key: `'poker_hand'`).
 There is no URL-based state — refreshing `/replay` redirects back to `/`.
 The back button in Replay uses `navigate(-1)` so it returns to Library or Index correctly.
+No shared nav component — each page has its own top bar with links to sibling pages.
 
 ---
 

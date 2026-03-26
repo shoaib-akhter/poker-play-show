@@ -8,7 +8,7 @@ A single-page web application for replaying PokerStars cash-game hand histories.
 
 ---
 
-## Current State (as of 2026-03-08 — updated)
+## Current State (as of 2026-03-26 — updated)
 
 ### Implemented and Working
 
@@ -31,6 +31,18 @@ A single-page web application for replaying PokerStars cash-game hand histories.
 | `strict: true` | ✅ Enabled (bundles strictNullChecks, strictFunctionTypes, etc.) |
 
 Both `tsconfig.json` (root) and `tsconfig.app.json` (app compilation unit) reflect these settings. Zero type errors.
+
+#### Range Analysis + Copy Hand (new — 2026-03-26)
+| Component | Status | Notes |
+|-----------|--------|-------|
+| `src/pages/Range.tsx` | ✅ Done | `/range`: 13×13 hand matrix heatmap, stakes + lastN filters, heatmap toggle |
+| `src/components/range/HandMatrix.tsx` | ✅ Done | 13×13 CSS grid; aggregates HandStats by combo key; P&L/Win%/Frequency heatmap modes |
+| `src/components/range/HandListPanel.tsx` | ✅ Done | shadcn Sheet; lists hands for a combo newest-first; ▶ replay button |
+| `src/lib/handStats.ts` — combo utils | ✅ Done | `getHandComboKey(c1,c2)` → "AKs"/"AA"/"72o"; `getMatrixPosition(key)` → `{row,col}` |
+| `HandStats.heroHoleCards` | ✅ Done | `heroHoleCards?: [Card, Card]` field added; populated in `computeHandStats()` |
+| Copy Hand button (Replay) | ✅ Done | Top bar button copies `sessionStorage['poker_hand']` to clipboard; Check icon 2s feedback |
+| IDB v5 upgrade | ✅ Done | Bumped from v4→v5; clears `hand_stats` to backfill `heroHoleCards` on next recalc |
+| Range nav links | ✅ Done | Grid2x2 icon link added to Index, Library, and Stats top bars |
 
 #### Hand Library (new — 2026-03-08)
 | Component | Status | Notes |
@@ -74,11 +86,11 @@ Both `tsconfig.json` (root) and `tsconfig.app.json` (app compilation unit) refle
 #### Test Coverage
 | Test file | Tests | Status |
 |-----------|-------|--------|
-| `handHistoryParser.test.ts` | 23 | ✅ All passing |
+| `handHistoryParser.test.ts` | 27 | ✅ All passing |
 | `handEvaluator.test.ts` | 17 | ✅ All passing |
 | `monteCarlo.test.ts` | 7 | ✅ All passing |
 | `example.test.ts` | 1 | ✅ Passing |
-| **Total** | **48** | **✅ 48/48** |
+| **Total** | **52** | **✅ 52/52** |
 
 ---
 
@@ -117,7 +129,7 @@ Both `tsconfig.json` (root) and `tsconfig.app.json` (app compilation unit) refle
 | PLO (Omaha) support | Requires 4-hole-card evaluation (C(6,4)×C(4,2) combos) |
 | Hand notes / annotation | Allow users to type notes per step, saved to localStorage |
 | Export to GIF / video | Step-through animation export |
-| Library: P&L over time chart | Recharts cumulative line chart (recharts already installed) |
+| ~~Library: P&L over time chart~~ | ✅ Done — P&L chart on Stats page |
 | Library: IDB clear / reset | Button to wipe the database and start fresh |
 
 ### Deployment (optional)
@@ -178,12 +190,15 @@ hand-replay/
     │
     ├── workers/
     │   ├── equityWorker.ts           # Web Worker: receives MonteCarloInput, posts MonteCarloResult
-    │   └── importWorker.ts           # Web Worker: batch-parses hands, posts progress+done messages
+    │   ├── importWorker.ts           # Web Worker: batch-parses hands, posts progress+done messages
+    │   └── statsWorker.ts            # Web Worker: recomputes HandStats from raw; posts progress+metaCorrections+done
     │
     ├── pages/
-    │   ├── Index.tsx                 # Landing page — hand history input + My Library link
-    │   ├── Replay.tsx                # Replay page — step nav, equity inputs, navigate(-1) back
-    │   ├── Library.tsx               # /library — import zone, stats, filter, hand table
+    │   ├── Index.tsx                 # Landing page — hand history input + Library/Stats/Range links
+    │   ├── Replay.tsx                # Replay page — step nav, equity inputs, Copy Hand button, navigate(-1) back
+    │   ├── Library.tsx               # /library — import zone, stats, filter, hand table; URL params ?position=&stakes=&last=
+    │   ├── Stats.tsx                 # /stats — stakes+lastN filters, P&L chart, GeneralStats, PositionStats, recalc banner
+    │   ├── Range.tsx                 # /range — stakes+lastN filters, heatmap toggle, HandMatrix, HandListPanel
     │   └── NotFound.tsx              # 404 fallback
     │
     ├── components/
@@ -196,7 +211,14 @@ hand-replay/
     │   │   ├── PlayingCard.tsx       # Single card: face-up or face-down, two sizes
     │   │   ├── ControlsBar.tsx       # Step prev/next, street jump buttons, reset
     │   │   └── SidePanel.tsx         # Street progress, equity panel, pot/stacks, action history
-    │   └── ui/                       # ~40 shadcn/ui components (Button, ScrollArea, etc.)
+    │   ├── stats/
+    │   │   ├── PnlChart.tsx          # Recharts cumulative P&L line ($/BB toggle)
+    │   │   ├── GeneralStats.tsx      # 4×3 grid of VPIP/PFR/3-Bet/WTSD/AF/etc
+    │   │   └── PositionStats.tsx     # Per-position table; clickable rows → Library filtered by position
+    │   ├── range/
+    │   │   ├── HandMatrix.tsx        # 13×13 CSS grid; P&L/Win%/Frequency heatmap; cell click
+    │   │   └── HandListPanel.tsx     # shadcn Sheet; hand list for a combo; ▶ replay button
+    │   └── ui/                       # ~40 shadcn/ui components (Button, ScrollArea, Sheet, etc.)
     │
     └── test/
         ├── setup.ts                  # matchMedia polyfill for jsdom
